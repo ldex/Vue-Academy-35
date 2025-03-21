@@ -1,47 +1,55 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
+import { useUserStore } from '@/stores/user';
+
+const userStore = useUserStore();
+
+userStore.checkPreviousLogin();
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-    </div>
-  </header>
-
-  <main>
-    <TheWelcome />
-  </main>
+<div id="app">
+    <h1>Vue Store</h1>
+    <nav>
+      <router-link to="/">Home</router-link>
+      <router-link to="/products">Products</router-link>
+      <router-link to="/about">About</router-link>
+      <router-link to="/admin">Admin</router-link>
+      <router-link v-if="!userStore.isLoggedIn" to="/login">Login</router-link>
+      <a v-else @click="userStore.logout()">Logout</a>
+    </nav>
+    <router-view v-slot="{ Component }">
+      <transition name="page" mode="out-in">
+        <component :is="Component" />
+      </transition>
+    </router-view>
+    <hr />
+    <footer>Copyright Vue Academy 2025</footer>
+  </div>
 </template>
 
 <style scoped>
-header {
-  line-height: 1.5;
+/* transitions */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
+@keyframes acrossIn {
+  0% { transform: translate3d(-100%, 0, 0); }
+  100% { transform: translate3d(0, 0, 0); }
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
+@keyframes acrossOut {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(100%, 0, 0); }
 }
 
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
+.page-enter-active {
+  animation: bounceIn .45s ease-out both;
+}
 
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
+.page-leave-active {
+  animation: flipOutX .65s ease-in both;
 }
 </style>
